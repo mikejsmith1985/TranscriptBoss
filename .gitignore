@@ -1,0 +1,63 @@
+# Purpose: keep build output, dependencies, local state and secrets out of version control.
+
+# --- The Omi fork (omi-fork/) ---
+# omi-fork/ is its own git repository — a fork of BasedHardware/omi carrying our
+# change on a branch, so it can be merged with upstream and offered back as a
+# pull request (plan.md D-4). It is deliberately not tracked here: TranscriptBoss
+# owns the specification, the fork owns the code. The pinned upstream commit is
+# recorded in specs/001-omi-audio-import/research.md, which is what makes the
+# pairing reproducible.
+omi-fork/
+
+# --- Python (tooling: scripts/check_function_length.py) ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# --- Node / TypeScript ---
+node_modules/
+dist/
+build/
+.vite/
+
+# --- Local runtime state (never commit) ---
+*.sqlite
+*.sqlite3
+*.db
+
+# --- Secrets (Article IX — vault-injected, never on disk) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Test fixtures that are large or user-supplied ---
+# Real-speech fixtures live on the device, not in the repository: an hour of
+# 16 kHz mono PCM16 is about 115 MB, and a pull request carrying it would be
+# refused. See omi-fork/app/integration_test/import/fixtures.dart.
+*.wav
+*.m4a
+*.mp3
+
+# --- Logs and temp ---
+*.log
+*.tmp
+*.swp
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Article XI: at most one dashboard, purged each session ---
+refactor_plan.html

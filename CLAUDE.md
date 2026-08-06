@@ -7,4 +7,25 @@
 @.specify/memory/constitution.md
 
 <!-- SPECKIT START -->
+## Active Feature
+
+**External Audio Import & Transcript Reconciliation for Omi** — `feature/omi-audio-import`
+
+| Artifact | Path |
+|---|---|
+| Plan | `specs/001-omi-audio-import/plan.md` |
+| Spec | `specs/001-omi-audio-import/spec.md` |
+| Research | `specs/001-omi-audio-import/research.md` |
+| Data model | `specs/001-omi-audio-import/data-model.md` |
+| Contracts | `specs/001-omi-audio-import/contracts/` |
+| Quickstart | `specs/001-omi-audio-import/quickstart.md` |
+
+**Stack**: Python 3.12 (worker daemon on the user's machine; operator-hosted control plane) · TypeScript/React (two bundles from shared components) · WhisperX for local transcription · Claude `claude-opus-5` for merge derivation · SQLite on the worker, PostgreSQL on the control plane.
+
+**Load-bearing constraints** — read `plan.md` before changing any of these:
+- Audio never leaves the user's machine on the default path; only finished text crosses to the control plane.
+- The Omi app integration credential lives only on the control plane — never in the worker.
+- Every import is resumable by stage and never re-transcribes (`contracts/import-job-states.md`).
+- One Omi conversation per source recording, guaranteed by an idempotency key written before any external call.
+- No action item reaches the user's task list without a recorded approval — enforced in persistence, not UI.
 <!-- SPECKIT END -->

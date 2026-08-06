@@ -1,0 +1,39 @@
+# Purpose: keep the control-plane container image small and free of local state.
+# Only control-plane/ is ever copied into the image — the worker never ships here.
+
+.git/
+.github/
+.specify/
+.claude/
+.forge/
+specs/
+scripts/
+
+# The worker and web bundles are not part of the control-plane image
+worker/
+web/
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Tests are not shipped
+control-plane/tests/
+
+# Secrets and local state
+.env
+.env.*
+*.pem
+*.key
+*.sqlite
+*.log
+
+Dockerfile*
+.dockerignore
