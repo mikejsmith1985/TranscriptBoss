@@ -31,8 +31,17 @@ source_files=$(echo "$staged_files" | grep -E '\.(go|js|jsx|ts|tsx|py|rs|java|cs
 # Every new source file must have a corresponding test file staged or on disk.
 # Build output directories are excluded — they contain compiled artifacts, not
 # authored source code, and must never be flagged for missing test coverage.
-new_source_files=$(git diff --cached --name-only --diff-filter=A 2>/dev/null | grep -E '\.(go|js|jsx|ts|tsx|py|rs|java|cs)$' | grep -vE '^(cmd/forge/web/|frontend/dist/|bin/)')
+new_source_files=$(git diff --cached --name-only --diff-filter=A 2>/dev/null | grep -E '\.(go|js|jsx|ts|tsx|py|rs|java|cs)$' | grep -vE '^(cmd/forge/web/|frontend/dist/|bin/|omi-fork/|vendor/|third_party/)')
 if [[ -n "$new_source_files" ]]; then
+    # Index every test-shaped filename ONCE.
+    #
+    # This used to run `find .` per candidate per staged file — O(files x candidates)
+    # full-tree walks. That is fine in a small repo and pathological in one that also
+    # contains a vendored checkout: with a Flutter monorepo under omi-fork/ a routine
+    # commit took minutes and had to be killed. Heavy directories are pruned for the
+    # same reason; nothing inside a dependency tree or a vendored fork is ever the
+    # test for a file we just wrote.
+    known_test_files=$(find .         \( -name .git -o -name omi-fork -o -name vendor -o -name third_party            -o -name node_modules -o -name .venv -o -name venv            -o -name __pycache__ -o -name .mypy_cache -o -name .pytest_cache            -o -name .ruff_cache -o -name dist -o -name build -o -name target \) -prune -o         -type f \( -name '*_test.*' -o -name 'test_*' -o -name '*.test.*'            -o -name '*.spec.*' -o -name '*Test.*' -o -name '*Tests.*' -o -name '*IT.java' \)         -print 2>/dev/null | sed 's#.*/##' | sort -u)
     while IFS= read -r new_file; do
         [[ -z "$new_file" ]] && continue
         base=$(basename "$new_file")
@@ -59,8 +68,10 @@ if [[ -n "$new_source_files" ]]; then
         if [[ "$extension" == "rs" && -f "$new_file" ]] && grep -q '#\[cfg(test)\]' "$new_file"; then has_test=true; fi
         if [[ "$has_test" == "false" ]]; then
             for cand in $candidates; do
-                # A test file staged or already present anywhere in the repo satisfies the gate.
-                if [[ -n "$(find . -type f -name "$cand" 2>/dev/null | head -n1)" ]]; then has_test=true; break; fi
+                # A test file staged or already present anywhere in the repo satisfies
+                # the gate. Matched against the index built above rather than by
+                # walking the tree again.
+                if echo "$known_test_files" | grep -qxF "$cand"; then has_test=true; break; fi
             done
         fi
         if [[ "$has_test" == "false" ]]; then

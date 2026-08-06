@@ -53,7 +53,14 @@ foreach ($filePath in $sourceFiles) {
 # language-specific: Go (_test.go), JS/TS (.test/.spec), Python (test_ prefix
 # or _test suffix), Rust (_test.rs or inline #[cfg(test)]), C# (Tests/Test
 # suffix), Java (Test/Tests/IT). Build output directories are excluded.
-$buildOutputDirs = @("cmd/forge/web/", "frontend/dist/", "bin/")
+$buildOutputDirs = @("cmd/forge/web/", "frontend/dist/", "bin/", "omi-fork/", "vendor/", "third_party/")
+
+# Directory names never worth walking when looking for a test file. Pruning them is
+# what keeps this gate usable in a repo that also contains a vendored checkout.
+$excludedDirNames = @(
+    ".git", "omi-fork", "vendor", "third_party", "node_modules", ".venv", "venv",
+    "__pycache__", ".mypy_cache", ".pytest_cache", ".ruff_cache", "dist", "build", "target"
+)
 $newSourceFiles = git diff --cached --name-only --diff-filter=A 2>$null | Where-Object {
     $extension = [System.IO.Path]::GetExtension($_)
     if (-not ($sourceExtensions -contains $extension)) { return $false }
@@ -86,6 +93,24 @@ $testCandidates = { param($leaf, $ext)
         default { return @() }
     }
 }
+# Index every test-shaped filename ONCE.
+#
+# This used to run `Get-ChildItem -Recurse` per candidate per staged file, which is
+# fine in a small repo and pathological in one that also contains a vendored checkout:
+# with a Flutter monorepo under omi-fork/, a routine commit took minutes and had to be
+# killed. Built only when there is something to check, so an ordinary commit that adds
+# no new source files pays nothing for it.
+$knownTestFiles = [System.Collections.Generic.HashSet[string]]::new(
+    [System.StringComparer]::OrdinalIgnoreCase)
+if ($newSourceFiles) {
+    Get-ChildItem -Path . -Recurse -File -ErrorAction SilentlyContinue | Where-Object {
+        foreach ($part in $_.FullName.Split([System.IO.Path]::DirectorySeparatorChar)) {
+            if ($excludedDirNames -contains $part) { return $false }
+        }
+        return $_.Name -match '(_test\.|^test_|\.test\.|\.spec\.|Test\.|Tests\.|IT\.java$)'
+    } | ForEach-Object { [void]$knownTestFiles.Add($_.Name) }
+}
+
 foreach ($newFile in $newSourceFiles) {
     if (& $isTestFile $newFile) { continue }
     $extension = [System.IO.Path]::GetExtension($newFile)
@@ -98,7 +123,9 @@ foreach ($newFile in $newSourceFiles) {
     if (-not $hasTest) {
         foreach ($cand in (& $testCandidates $leaf $extension)) {
             if ($stagedFiles | Where-Object { [System.IO.Path]::GetFileName($_) -eq $cand }) { $hasTest = $true; break }
-            if (Get-ChildItem -Path . -Recurse -File -Filter $cand -ErrorAction SilentlyContinue | Select-Object -First 1) { $hasTest = $true; break }
+            # Matched against the index built once above, rather than walking the whole
+            # tree again for every candidate.
+            if ($knownTestFiles.Contains($cand)) { $hasTest = $true; break }
         }
     }
     if (-not $hasTest) {
