@@ -6,6 +6,67 @@
 
 @.specify/memory/constitution.md
 
+## Upstream Contribution Standard (BINDING — all work touching `omi-fork/`)
+
+Work in `omi-fork/` is aimed at pull requests to **BasedHardware/omi**. Their standard
+governs that code, and it is stricter than ours in several places. **Read the live files
+before starting — never from memory or from this summary alone**: `AGENTS.md` (root),
+the nearest component guide (`app/AGENTS.md`, `backend/AGENTS.md`), `CONTRIBUTING.md`,
+`docs/doc/developer/Contribution.mdx`, `PRODUCT.md`, and `docs/product/invariants/`.
+Where their rules and ours disagree on `omi-fork/` code, **theirs win** — a PR that
+fails their gate is worthless regardless of how well it satisfies ours.
+
+### Before writing code
+- **Check product fit.** Read `PRODUCT.md` and the invariant registry. If the diff
+  touches a locked invariant's path globs, name **every** matched invariant ID in the
+  PR body (path-based, not intent-based). Discover with `scripts/pr-preflight --suggest`.
+- **Large or ambiguous features start as a GitHub issue**, not a PR. Issues state
+  problems with evidence; PRs state solutions. No implementation epics in an issue.
+- **Verify every code claim against current upstream code first** — the fix may already
+  exist, or the file may have moved.
+
+### Definition of Done (theirs, applies to every PR)
+1. Behavior changed → a test changed. Bug fixes include the regression test that would
+   have caught the bug. New features test the core path and the main error path.
+2. The component suite passes locally (`app/test.sh`, `backend/test.sh`).
+3. **You exercised the real user-facing path.** If you could not, say so explicitly
+   rather than implying it works.
+4. Verification evidence written down — the commands run and what they showed.
+5. No orphaned `TODO`/`FIXME`/`HACK` without a tracking issue.
+6. Docs move with the code, in the same PR.
+7. `fix:` commits declare `Failure-Class: FC-<slug> | new | none`, validated with
+   `scripts/failure-class`. Use `harden:` for strengthening a boundary with no
+   triggering incident — it needs no declaration.
+8. `make preflight` passes before opening the PR; then
+   `scripts/pr-preflight --pr-body-file <draft>`.
+
+### Rules that most often catch us
+- **Tests in CI must be hermetic** — no live services, network, sleeps, or ordering
+  dependence. Live-service validation is welcome as extra evidence, never as the only proof.
+- **Behavioral tests must execute production behavior** through a controllable seam.
+  Asserting that source strings appear in order is a static tripwire, not coverage — and
+  must be labelled as such.
+- **Prefer primitives to guards.** Before adding a check or ratchet, answer in the PR
+  body: "why isn't this a shared primitive?" A new guard must cite the real merged PR or
+  incident it would have caught; no real instance means it does not land.
+- **No in-repo compatibility layers** — migrate every in-tree caller in the same change.
+  No deprecated aliases or fallback paths kept for a retired shape.
+- **Never use purple** anywhere in UI. Enforced as a ratchet (`INV-UI-1`).
+- **Never edit generated files** (`*.g.dart`, `*.gen.dart`, `Generated/`). Regenerate.
+- Formatting: `dart format --line-length 120` (Dart), `black --line-length 120
+  --skip-string-normalization` (Python).
+- **Do not add rules to `omi-fork/CLAUDE.md`** — it is a pointer to `AGENTS.md` by design.
+
+### How our constitution applies inside the fork
+Our stricter Article IV rules are scoped to files we author, via
+`scripts/check-article-iv.ps1` and `app/analysis_options_transcriptboss.yaml`. They must
+never be applied tree-wide: Omi gates PRs with an analyzer ratchet counted across the
+whole app, and turning our rules on globally would redden their gate on code we did not
+write. Add each new path we own to that script's `$ownedPaths`.
+
+Articles III (feature branches) and X (proof, not "it compiles") apply unchanged.
+Never push to `omi-fork` remotes or open a PR without explicit instruction.
+
 <!-- SPECKIT START -->
 ## Active Feature
 
