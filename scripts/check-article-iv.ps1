@@ -51,7 +51,10 @@ $ownedPaths = @(
     'lib/services/audio_sources/file_import_source.dart',
     'lib/audio_decoder_interface.dart',
     'lib/pages/import',
+    'lib/pages/export',
+    'lib/services/export',
     'test/unit/import',
+    'test/unit/export',
     'integration_test/import'
 )
 
@@ -76,13 +79,42 @@ if (-not $SkipAnalyzer) {
         Write-Warning 'dart is not on PATH — skipping the analyzer. Install the Flutter SDK to enable it.'
     }
     else {
-        $optionsFile = Join-Path $appRootResolved 'analysis_options_transcriptboss.yaml'
+        # `dart analyze` has no --options flag: the analyzer picks the nearest
+        # analysis_options.yaml walking up from each file. So the only way to apply
+        # our stricter rules to our files alone is to seed that file beside them for
+        # the length of the run and take it away afterwards. Leaving it in place is
+        # what we must not do — a permanent one would put our rules inside the tree
+        # Omi's own ratchet counts, which is the exact collision this scoping exists
+        # to avoid (plan.md D-4).
+        $strictOptions = Join-Path $appRootResolved 'analysis_options_transcriptboss.yaml'
+        $seededFiles = @()
+
+        # A named file is governed by the options file in its parent directory, so
+        # that is where the seed has to go.
+        $seedDirs = $existing | ForEach-Object {
+            if (Test-Path $_ -PathType Container) { $_ } else { Split-Path $_ -Parent }
+        } | Select-Object -Unique
+
         Push-Location $appRootResolved
         try {
-            & dart analyze --options=$optionsFile @existing
+            foreach ($seedDir in $seedDirs) {
+                $seedPath = Join-Path $seedDir 'analysis_options.yaml'
+                # Never clobber a real one that the tree already relies on.
+                if (Test-Path $seedPath) { continue }
+                $relativeInclude = (Resolve-Path -Relative -Path $strictOptions -RelativeBasePath $seedDir) -replace '\\', '/'
+                Set-Content -Path $seedPath -Value "include: $relativeInclude" -Encoding utf8
+                $seededFiles += $seedPath
+            }
+
+            & dart analyze @existing
             if ($LASTEXITCODE -ne 0) { $failed = $true }
         }
-        finally { Pop-Location }
+        finally {
+            foreach ($seededFile in $seededFiles) {
+                Remove-Item -Path $seededFile -Force -ErrorAction SilentlyContinue
+            }
+            Pop-Location
+        }
     }
 }
 

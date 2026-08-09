@@ -289,6 +289,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a crash makes unreliable. Starting over costs a re-transcription on hardware that
   does it for free; resuming wrongly costs a conversation with a hole in it that the
   user cannot detect (FR-019, SC-007)
+- **Bulk export of recordings to WAV** — "Export all as WAV" on the sync page's Manage
+  Storage sheet decodes every recording still held on the phone and offers the whole
+  batch to the system share sheet in one go. The app could already share one recording
+  at a time, which is fine for one and unusable for fifty; a user who has accumulated
+  fifty is exactly the user who most needs them off the phone. `WalBulkExporter` owns
+  the rules that make an unattended run trustworthy: a recording that cannot be read is
+  recorded as a failure and the run continues, progress is reported after every
+  recording so a long decode is visibly alive rather than apparently frozen, and a
+  cancelled run still returns everything it had finished. Decoding reuses the app's
+  existing Opus/PCM→WAV path rather than growing a second one, and `share_plus` does
+  the multi-file share it already supported (Article VII)
+- A recording showing **"synced" does not mean its audio was kept**. Retention is gated
+  on the account's Private Cloud Sync setting, which is off by default: with it off the
+  backend transcribes and discards, so the conversation survives and the recording does
+  not. This is why exporting from the phone is worth doing before clearing anything
 
 ### Changed
 
