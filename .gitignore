@@ -9,6 +9,14 @@
 # pairing reproducible.
 omi-fork/
 
+# Worktrees of that fork, one per upstream pull request, because Omi's own
+# AGENTS.md asks that code changes happen in a worktree rather than by switching
+# branches. Each is a full checkout of the Omi tree — around eleven thousand
+# files — and none of it belongs to this repository. The pattern is anchored to
+# the root and deliberately open-ended: the next pull request makes the next one,
+# and a rule that has to be edited every time is a rule that will be forgotten.
+/omi-*/
+
 # --- Python (tooling: scripts/check_function_length.py) ---
 __pycache__/
 *.py[cod]

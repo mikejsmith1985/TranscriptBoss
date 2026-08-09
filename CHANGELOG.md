@@ -304,6 +304,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on the account's Private Cloud Sync setting, which is off by default: with it off the
   backend transcribes and discards, so the conversation survives and the recording does
   not. This is why exporting from the phone is worth doing before clearing anything
+- **Upstream contributions to BasedHardware/omi**, worked in git worktrees off current
+  production rather than off our pinned fork, because Omi reviews against `main` and our
+  fork is hundreds of commits behind it. The worktrees are ignored here; each is a full
+  checkout of their tree and none of it is ours. What each branch is for:
+
+  | Branch | Upstream | State |
+  |---|---|---|
+  | `feature/app-store-search` (`omi-prod/`) | [PR #11293](https://github.com/BasedHardware/omi/pull/11293) — search progress indicator that does not time out | Open, awaiting review |
+  | `fix/app-search-empty-flash` (`omi-pr2/`) | [PR #11297](https://github.com/BasedHardware/omi/pull/11297) — search holds its searching state until the newest query lands | Open, review bot cleared |
+
+  Issues raised rather than patched, because each needed a decision that was theirs to
+  make: [#11292](https://github.com/BasedHardware/omi/issues/11292) app search fetches
+  and enriches the whole catalog per query — **they merged the name-vs-description half
+  themselves and handed the query-pushdown half back to us**, and a design proposal for
+  it is open on that thread; [#11295](https://github.com/BasedHardware/omi/issues/11295)
+  a conversation stuck in `processing` renders forever with no age or way to clear it;
+  [#11296](https://github.com/BasedHardware/omi/issues/11296) "My Apps" filters by
+  authorship so it is permanently empty for anyone who has not built an app. The last two
+  are parked at *Someday* on their board.
 
 ### Changed
 
