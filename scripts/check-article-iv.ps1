@@ -66,6 +66,7 @@ $ownedPaths = @(
     'lib/services/capture/recdot_capture_session.dart',
     'lib/utils/audio/g722_decoder.dart',
     'lib/utils/audio/msbc_decoder.dart',
+    'lib/services/devices/recdot/recdot_commands.dart',
     'test/unit/recdot_starot_codec_test.dart',
     'test/unit/recdot_commands_test.dart',
     'test/unit/recdot_device_test.dart',
