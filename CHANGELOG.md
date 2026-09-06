@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `scripts/recdot_wire.py` — reference encoder/decoder for those layouts, with
   hermetic tests that pin the exact wire bytes the notes claim; it is the
   independent implementation the Omi connector's golden fixtures will come from
+  (its first golden vector is the advertisement a real RecDot broadcast to the
+  user's iPhone)
 - Forge Workflow initialized with Forge Terminal Workflow Architect
 - Specification, plan, and task breakdown for **External Audio Import & Transcript
   Reconciliation for Omi** under `specs/001-omi-audio-import/`

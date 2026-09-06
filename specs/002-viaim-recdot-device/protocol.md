@@ -62,9 +62,19 @@ company id normally goes, so a generic scanner will mis-read the company id. Sec
 heuristics in the app: classic address OUI `20:FF:…` or `0C:1B:…`, or a classic name
 containing `iflybuds` / `viaim`.
 
-### 2.3 Consequence for iOS — UNRESOLVED
+**Observed on the user's iPhone (nRF Connect, 2026-09-06)**: the RecDot advertises exactly
+this blob, `08 08 08 00 FF FF 30 41 20 FF 36 E9 2A 64 20 FF 36 E9 08 E0 00`, which the
+reference codec decodes to product 8 with bud addresses `20:FF:36:E9:2A:64` /
+`20:FF:36:E9:08:E0`. The scanner shows it **unnamed**, labels the first two bytes as a
+company id, lists Battery Service `0x180F` in the advert, and offers **no Connect button**:
+the advertisement is non-connectable. That is consistent with BLE being discovery-only.
 
-A third-party iOS app cannot open RFCOMM. The viaim iOS app therefore uses one of:
+### 2.3 Consequence for iOS — UNRESOLVED, MFi now the leading hypothesis
+
+A third-party iOS app cannot open RFCOMM, and the BLE advert is non-connectable. viaim
+markets the sibling OpenNote as "MFi certified", which for a Bluetooth accessory means iAP2
+over the Classic link, i.e. an External Accessory session. The viaim iOS app therefore uses
+one of:
 
 | Possibility | How Omi would follow | How to confirm |
 |---|---|---|

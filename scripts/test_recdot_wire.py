@@ -247,6 +247,17 @@ def test_advertisement_identifies_recdot_and_reads_battery_and_macs() -> None:
     )
 
 
+def test_advertisement_captured_from_a_real_recdot_on_iphone_decodes_as_product_8() -> None:
+    # Golden bytes: nRF Connect on the user's iPhone, 2026-09-06. The scanner mis-labelled
+    # the first two bytes as a company id, which is why the buds show up unnamed.
+    captured = bytes.fromhex("0808 0800 FFFF 3041 20FF 36E9 2A64 20FF 36E9 08E0 00".replace(" ", ""))
+    advert = decode_advertisement(captured)
+    assert advert.product_id == 8
+    assert advert.left_mac == "20:FF:36:E9:2A:64"
+    assert advert.right_mac == "20:FF:36:E9:08:E0"
+    assert advert.feature == 0
+
+
 def test_advertisement_prefix_letter_scales_product_id() -> None:
     assert decode_advertisement(_advertisement(0x08, ord("E"))).product_id == 6908
 
