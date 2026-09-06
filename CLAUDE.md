@@ -70,23 +70,27 @@ Never push to `omi-fork` remotes or open a PR without explicit instruction.
 <!-- SPECKIT START -->
 ## Active Feature
 
-**External Audio Import & Transcript Reconciliation for Omi** — `feature/omi-audio-import`
+**viaim RecDot as a Native Omi Device** — `feature/viaim-recdot-device` (here) · `feature/viaim-recdot` (fork worktree `omi-recdot/`)
 
 | Artifact | Path |
 |---|---|
-| Plan | `specs/001-omi-audio-import/plan.md` |
-| Spec | `specs/001-omi-audio-import/spec.md` |
-| Research | `specs/001-omi-audio-import/research.md` |
-| Data model | `specs/001-omi-audio-import/data-model.md` |
-| Contracts | `specs/001-omi-audio-import/contracts/` |
-| Quickstart | `specs/001-omi-audio-import/quickstart.md` |
+| Plan | `specs/002-viaim-recdot-device/plan.md` |
+| Spec | `specs/002-viaim-recdot-device/spec.md` |
+| Protocol (observed) | `specs/002-viaim-recdot-device/protocol.md` |
+| Research | `specs/002-viaim-recdot-device/research.md` |
+| Data model | `specs/002-viaim-recdot-device/data-model.md` |
+| Contracts | `specs/002-viaim-recdot-device/contracts/` |
+| Quickstart | `specs/002-viaim-recdot-device/quickstart.md` |
+| Reference codec | `scripts/recdot_wire.py` (+ `scripts/test_recdot_wire.py`) |
 
-**Stack**: Python 3.12 (worker daemon on the user's machine; operator-hosted control plane) · TypeScript/React (two bundles from shared components) · WhisperX for local transcription · Claude `claude-opus-5` for merge derivation · SQLite on the worker, PostgreSQL on the control plane.
+**Stack**: Dart/Flutter in the Omi fork · Swift External Accessory transport (iOS) · Kotlin RFCOMM transport (Android, parity only) · Pigeon bridge · pure-Dart G.722 decoder · Python reference codec and golden-vector generators in `scripts/`.
 
 **Load-bearing constraints** — read `plan.md` before changing any of these:
-- Audio never leaves the user's machine on the default path; only finished text crosses to the control plane.
-- The Omi app integration credential lives only on the control plane — never in the worker.
-- Every import is resumable by stage and never re-transcribes (`contracts/import-job-states.md`).
-- One Omi conversation per source recording, guaranteed by an idempotency key written before any external call.
-- No action item reaches the user's task list without a recorded approval — enforced in persistence, not UI.
+- iOS first via the fork's `personal/ci` Codemagic workflow → TestFlight; the user never tests Android; nothing goes upstream before the user's TestFlight sign-off.
+- Both sides of a call are kept as two channels through to transcription; attribution is never guessed from a mix.
+- Framing, TLV and audio-split live in Dart and must match `scripts/recdot_wire.py` byte for byte (golden vectors).
+- FlashRecord transfer never runs during a call or live capture, and deletion on the bud is only reachable from the "imported" state — enforced in persistence, not UI.
+- No behaviour change to any existing Omi device or capture path.
+
+Previous feature, still the fallback path: `specs/001-omi-audio-import/` (`feature/omi-audio-import`).
 <!-- SPECKIT END -->
