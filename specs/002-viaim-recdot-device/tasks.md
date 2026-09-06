@@ -42,7 +42,7 @@
 
 - [X] T009 Write `test/unit/recdot_starot_codec_test.dart` loading every `recdot_golden/*.json` and asserting obligations C-1..C-8 of `contracts/starot-codec.md`; it must fail to compile because `starot_codec.dart` does not exist
 - [X] T010 Implement `lib/services/devices/recdot/starot_codec.dart`: `StarotFrame`, `encodeFrame`, `StarotFramer.feed`, ack helpers, `TlvAttribute` encode/decode, `splitCallAudio`, `parseFlashChunk`, `encodeGetRecord`, `decodeAdvertisement`. Pure, no I/O, every function under 40 lines, file header states the Article VII gap (plan C-1). Run T009 to green
-- [ ] T011 [P] Add opcode and attribute constants to `lib/services/devices/recdot/recdot_commands.dart` (`0x5101`, `0x550B`, `0x5500`, `0x5505/0x5504`, `0x5534`, `0x5410`, `0x500B/0x500C/0x5007/0x500F/0x5010/0x5013/0x5015`, `0x5A75/0x5A76/0x5A77`, `0x5A31..0x5A3D`) with typed request builders and response parsers (`BatteryReport`, `VersionReport`, `SerialReport`, `StoredRecordingEntry`), plus `test/unit/recdot_commands_test.dart` covering each parser against hand-built payloads from protocol.md §5–§7
+- [X] T011 [P] Add opcode and attribute constants to `lib/services/devices/recdot/recdot_commands.dart` (`0x5101`, `0x550B`, `0x5500`, `0x5505/0x5504`, `0x5534`, `0x5410`, `0x500B/0x500C/0x5007/0x500F/0x5010/0x5013/0x5015`, `0x5A75/0x5A76/0x5A77`, `0x5A31..0x5A3D`) with typed request builders and response parsers (`BatteryReport`, `VersionReport`, `SerialReport`, `StoredRecordingEntry`), plus `test/unit/recdot_commands_test.dart` covering each parser against hand-built payloads from protocol.md §5–§7
 
 ### G.722 decoder (Dart)
 

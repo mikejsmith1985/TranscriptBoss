@@ -105,6 +105,21 @@ citation; upstream `Info.plist` already declares an accessory protocol (Ray-Ban 
 `_legacyDeviceTypeNames` is index-ordered and append-only; Pigeon for `pigeon_interfaces.dart` is
 regenerated with `flutter pub run build_runner build`.
 
+**Device-identity edit map (for T014/T015, verified at 1d91c471cd)**: append `viaimRecDot` (index 10)
+to `DeviceType` and `_legacyDeviceTypeNames`; add cases to the exhaustive switches in
+`bt_device.dart` (`analyticsVendor`, `getFirmwareWarningTitle`, `getFirmwareWarningMessage`, the
+`getDeviceInfo` dispatch), `conversation_source_for_device.dart`, `capture/capture_controller.dart`
+(`_nativeBleAudioTarget` → null, `supportsTranscribeLater`), `utils/device.dart`
+(`getDeviceImagePath`, `analyticsHardwareFamily`); append `externalAccessory` and `bluetoothClassic`
+to `TransportKind` (index 3/4) with `metaDat`-style factories and `fromJson` cases; add
+`ConversationSource.viaim_recdot = 'viaim_recdot'` to `backend/models/conversation_enums.py` and the
+mirror Dart enum; update the two exhaustive-map tests (`bt_device_from_json_test.dart` vendor map,
+`rayban_meta_source_mapping_test.dart` source map) and `test/utils/device_test.dart`. Non-exhaustive
+but wanted: `analytics_manager.dart:704` transport-id arm, `firmware_update_build_policy.dart:34`
+return false. **Image asset**: a new `assets/images/viaim_recdot.png` plus a build_runner regen of
+`assets.gen.dart` (never hand-edit the generated file); until the art exists this is the one edit
+that needs an asset, so T016 supplies it before T015 compiles clean. Analytics vendor `viaim`.
+
 - **iOS transport**: External Accessory session on protocol `com.vision.voyager`
   (protocol.md §2.3). iAP2 sessions stay open in the background with the
   `external-accessory` background mode; a suspended app is woken when data arrives. Community

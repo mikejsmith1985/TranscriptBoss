@@ -266,6 +266,19 @@ Feature area "OfflineControl"; vendor UI strings call it 闪录.
 | `0x5520` / `0x5521` | get / set name | TLV 1 = UTF-8 |
 | `0x5A71` FIND_HEADSET | attr 1 start / 2 stop, value 1 left / 0 right | |
 
+**Reply field layouts (from the vendor bean classes)**:
+
+- Battery attr value is one byte: `0xFF` absent; else bit 7 charging, bits 0–6 percent. Attr 1 =
+  left, 2 = right, 3 = case, in both `0x5505` reply and the `0x5504` push.
+- Serial (`0x550B`) side byte: `0` = right, `1` = left (the app's `DevSNType` also has 2 = right,
+  4 = case for other messages, but the SN reply uses 0/1).
+- Version (`0x5500`) data is an 8-byte hex string; product code is hex characters 2–4; the dotted
+  version is the last four bytes, rendered as decimal for product ≥ 7 and as characters for the
+  older `A04` line. RecDot (product 8) uses the decimal form.
+- Stored-recording list (`0x5A37`) sample-rate attr: `1` = 8 kHz, else 16 kHz. Type attr: `0` =
+  call (two-way), `1` = far-field room (single). End-of-list marker is attr `15`.
+- FlashRecord stop reason (`0x5A34`): 0 flash error, 1 storage full, 2 call ended, 3 long-press stop.
+
 Battery also arrives for free in every BLE advert (§2.2), which Omi can use before connecting.
 
 ## 8. Translator bulk-transfer layer (app → bud, not needed for capture)
