@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Protocol notes for the **viaim RecDot** earbuds under `specs/002-viaim-recdot-device/`,
+  recovered from the vendor's Android app: v2 framing, bond-code handshake, the
+  two-channel call-audio stream, and the FlashRecord download commands. The iOS
+  transport is recorded as unresolved.
+- `scripts/recdot_wire.py` — reference encoder/decoder for those layouts, with
+  hermetic tests that pin the exact wire bytes the notes claim; it is the
+  independent implementation the Omi connector's golden fixtures will come from
 - Forge Workflow initialized with Forge Terminal Workflow Architect
 - Specification, plan, and task breakdown for **External Audio Import & Transcript
   Reconciliation for Omi** under `specs/001-omi-audio-import/`
