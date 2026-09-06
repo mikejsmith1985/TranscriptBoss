@@ -67,7 +67,10 @@ this blob, `08 08 08 00 FF FF 30 41 20 FF 36 E9 2A 64 20 FF 36 E9 08 E0 00`, whi
 reference codec decodes to product 8 with bud addresses `20:FF:36:E9:2A:64` /
 `20:FF:36:E9:08:E0`. The scanner shows it **unnamed**, labels the first two bytes as a
 company id, lists Battery Service `0x180F` in the advert, and offers **no Connect button**:
-the advertisement is non-connectable. That is consistent with BLE being discovery-only.
+the advertisement is non-connectable (nRF Connect's detail view: **Connectable: No**, adverts
+every ~170–330 ms, −21 to −33 dBm with the buds beside the phone, connected services: none).
+**BLE GATT is therefore ruled out as the iOS transport while the buds are paired and connected
+to the phone.** Whether the advert turns connectable in pairing mode is untested.
 
 ### 2.3 Consequence for iOS — UNRESOLVED, MFi now the leading hypothesis
 
