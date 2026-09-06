@@ -8,7 +8,7 @@ byte-for-byte with `scripts/recdot_wire.py`, which generates its golden vectors.
 | Id | Obligation | Golden source |
 |---|---|---|
 | C-1 | `encodeFrame(opcode, payload)` produces `55 len cmd(2 BE) payload` for totals ≤ 255 and `56 (total−256) …` for totals ≥ 257; refuses payload > 508 and a total of exactly 256 | `test_recdot_wire.py` framing tests |
-| C-2 | `Framer.feed(bytes)` yields complete frames across arbitrary chunk boundaries, resynchronises on `0x55`/`0x56`/`0xFF` after garbage, and never yields a partial frame | new vectors: split points at every byte of a 3-frame stream |
+| C-2 | `Framer.feed(bytes)` yields complete frames across arbitrary chunk boundaries, resynchronises on `0x55`/`0x56` after garbage, and never yields a partial frame. The legacy `0xFF` v1 sync is deliberately not honoured: the RecDot is v2-only and a stray `0xFF` would swallow real frames | `framer_splits.json`: a 3-frame stream fed whole, byte by byte, in 7-byte chunks, and behind a garbage prefix |
 | C-3 | An ACK is `command & 0x8000`; `ackStatus` is payload[0]; `ackData` starts at payload[1] | `test_ack_frame_carries_status_byte_then_data` |
 | C-4 | TLV groups encode `[valueLen+1][attr][value]` and decode with the same length rule; truncation is an error | TLV tests |
 | C-5 | `splitCallAudio(payload)` returns speaker and mic halves per the channel bitmask; odd two-channel payload is an error | call-audio tests |

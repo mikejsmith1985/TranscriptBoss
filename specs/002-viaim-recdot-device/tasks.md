@@ -20,11 +20,11 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Create the fork worktree: `git -C omi-fork worktree add ../omi-recdot -b feature/viaim-recdot origin/main` (current upstream main, per the contribution standard), and record the pinned commit in `specs/002-viaim-recdot-device/research.md` Part 2
-- [ ] T002 Install the Flutter SDK (stable) on this Windows machine so `flutter test` and `dart analyze` run locally for the hermetic layer; no Android SDK is needed for that. Record the version in `research.md`. If declined, every test task below runs only in Codemagic
-- [ ] T003 [P] Add the owned paths from plan.md's source tree to `scripts/check-article-iv.ps1` `$ownedPaths` (the `services/devices/recdot/`, connector, transport, discoverer, bridge, audio source, capture session, `utils/audio/g722_decoder.dart`, and their tests)
-- [ ] T004 [P] Read the live upstream rules before writing fork code: `omi-recdot/AGENTS.md`, `omi-recdot/app/AGENTS.md`, `CONTRIBUTING.md`, `docs/doc/developer/Contribution.mdx`, `PRODUCT.md`, `docs/product/invariants/`; run `scripts/pr-preflight --suggest` on an empty diff and note any invariant globs that `lib/services/devices/**` or `ios/Runner/Info.plist` match in `research.md`
-- [ ] T005 [P] Install the bit-exact Python G.722 package for fixture generation: `python -m pip install --target scripts/.tools/pyg722 G722`, and add `scripts/.tools/` to `.gitignore`
+- [X] T001 Create the fork worktree: `git -C omi-fork worktree add ../omi-recdot -b feature/viaim-recdot origin/main` (current upstream main, per the contribution standard), and record the pinned commit in `specs/002-viaim-recdot-device/research.md` Part 2
+- [X] T002 Install the Flutter SDK (stable) on this Windows machine so `flutter test` and `dart analyze` run locally for the hermetic layer; no Android SDK is needed for that. Record the version in `research.md`. If declined, every test task below runs only in Codemagic
+- [X] T003 [P] Add the owned paths from plan.md's source tree to `scripts/check-article-iv.ps1` `$ownedPaths` (the `services/devices/recdot/`, connector, transport, discoverer, bridge, audio source, capture session, `utils/audio/g722_decoder.dart`, and their tests)
+- [X] T004 [P] Read the live upstream rules before writing fork code: `omi-recdot/AGENTS.md`, `omi-recdot/app/AGENTS.md`, `CONTRIBUTING.md`, `docs/doc/developer/Contribution.mdx`, `PRODUCT.md`, `docs/product/invariants/`; run `scripts/pr-preflight --suggest` on an empty diff and note any invariant globs that `lib/services/devices/**` or `ios/Runner/Info.plist` match in `research.md`
+- [X] T005 [P] Install the bit-exact Python G.722 package for fixture generation: `python -m pip install --target scripts/.tools/pyg722 G722`, and add `scripts/.tools/` to `.gitignore`
 
 ---
 
@@ -34,20 +34,20 @@
 
 ### Golden vectors (TranscriptBoss side)
 
-- [ ] T006 Write `scripts/generate_recdot_vectors.py` that uses `scripts/recdot_wire.py` to emit `omi-recdot/app/test/fixtures/recdot_golden/{framing,ack,tlv,call_audio,flash_chunk,get_record,advertisement,framer_splits}.json` in the format of `contracts/starot-codec.md`; include the real iPhone advert and a 3-frame stream split at every byte boundary (obligation C-2)
-- [ ] T007 [P] Write `scripts/generate_g722_vectors.py` that encodes silence, a 1 kHz tone, and white noise at 16 kHz and 8 kHz modes with the Python package (samples passed as int16 arrays, not bytes) and emits `omi-recdot/app/test/fixtures/g722_golden/*.json` with hex G.722 in and hex PCM16 out, including a vector split at frame boundaries for obligation G-3
-- [ ] T008 [P] Add `scripts/test_generate_vectors.py` asserting both generators are deterministic (same output twice) and that every `input_hex`/`expected` pair decodes through `recdot_wire.py`; run `python -m pytest scripts -q`
+- [X] T006 Write `scripts/generate_recdot_vectors.py` that uses `scripts/recdot_wire.py` to emit `omi-recdot/app/test/fixtures/recdot_golden/{framing,ack,tlv,call_audio,flash_chunk,get_record,advertisement,framer_splits}.json` in the format of `contracts/starot-codec.md`; include the real iPhone advert and a 3-frame stream split at every byte boundary (obligation C-2)
+- [X] T007 [P] Write `scripts/generate_g722_vectors.py` that encodes silence, a 1 kHz tone, and white noise at 16 kHz and 8 kHz modes with the Python package (samples passed as int16 arrays, not bytes) and emits `omi-recdot/app/test/fixtures/g722_golden/*.json` with hex G.722 in and hex PCM16 out, including a vector split at frame boundaries for obligation G-3
+- [X] T008 [P] Add `scripts/test_generate_vectors.py` asserting both generators are deterministic (same output twice) and that every `input_hex`/`expected` pair decodes through `recdot_wire.py`; run `python -m pytest scripts -q`
 
 ### STAROT codec (Dart)
 
-- [ ] T009 Write `test/unit/recdot_starot_codec_test.dart` loading every `recdot_golden/*.json` and asserting obligations C-1..C-8 of `contracts/starot-codec.md`; it must fail to compile because `starot_codec.dart` does not exist
-- [ ] T010 Implement `lib/services/devices/recdot/starot_codec.dart`: `StarotFrame`, `encodeFrame`, `StarotFramer.feed`, ack helpers, `TlvAttribute` encode/decode, `splitCallAudio`, `parseFlashChunk`, `encodeGetRecord`, `decodeAdvertisement`. Pure, no I/O, every function under 40 lines, file header states the Article VII gap (plan C-1). Run T009 to green
+- [X] T009 Write `test/unit/recdot_starot_codec_test.dart` loading every `recdot_golden/*.json` and asserting obligations C-1..C-8 of `contracts/starot-codec.md`; it must fail to compile because `starot_codec.dart` does not exist
+- [X] T010 Implement `lib/services/devices/recdot/starot_codec.dart`: `StarotFrame`, `encodeFrame`, `StarotFramer.feed`, ack helpers, `TlvAttribute` encode/decode, `splitCallAudio`, `parseFlashChunk`, `encodeGetRecord`, `decodeAdvertisement`. Pure, no I/O, every function under 40 lines, file header states the Article VII gap (plan C-1). Run T009 to green
 - [ ] T011 [P] Add opcode and attribute constants to `lib/services/devices/recdot/recdot_commands.dart` (`0x5101`, `0x550B`, `0x5500`, `0x5505/0x5504`, `0x5534`, `0x5410`, `0x500B/0x500C/0x5007/0x500F/0x5010/0x5013/0x5015`, `0x5A75/0x5A76/0x5A77`, `0x5A31..0x5A3D`) with typed request builders and response parsers (`BatteryReport`, `VersionReport`, `SerialReport`, `StoredRecordingEntry`), plus `test/unit/recdot_commands_test.dart` covering each parser against hand-built payloads from protocol.md §5–§7
 
 ### G.722 decoder (Dart)
 
-- [ ] T012 Write `test/unit/g722_decoder_test.dart` loading `g722_golden/*.json` and asserting G-1..G-4; fails for want of the module
-- [ ] T013 Implement `lib/utils/audio/g722_decoder.dart` as a pure-Dart port of the public-domain `libg722` decoder (both sample-rate modes, 64 kbit/s, `reset()`), plus an 8k→16k upsampler for the 8 kHz mode; header credits Steve Underwood and CMU and records the Article VII gap (plan C-2). Run T012 to green and note the per-frame decode time from the test output
+- [X] T012 Write `test/unit/g722_decoder_test.dart` loading `g722_golden/*.json` and asserting G-1..G-4; fails for want of the module
+- [X] T013 Implement `lib/utils/audio/g722_decoder.dart` as a pure-Dart port of the public-domain `libg722` decoder (both sample-rate modes, 64 kbit/s, `reset()`), plus an 8k→16k upsampler for the 8 kHz mode; header credits Steve Underwood and CMU and records the Article VII gap (plan C-2). Run T012 to green and note the per-frame decode time from the test output
 
 ### Device identity
 

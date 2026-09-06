@@ -93,6 +93,18 @@ is the substitute for this feature.
 `1d91c471cd` ("fix(desktop): shorten settings search placeholder", 2026-09-06). Remotes: `upstream`/`origin` =
 BasedHardware/omi (origin push disabled), `fork` = mikejsmith1985/omi.
 
+**Toolchain (T002, 2026-09-06)**: Flutter 3.47.2 stable installed at `%LOCALAPPDATA%lutter`;
+`flutter test` runs the hermetic layer locally. Codemagic pins **3.44.5**, so the SDK is switched to
+that tag to stop `pubspec.lock`/`analysis_options.yaml` churn from tool migrations; any such churn is
+reverted before every fork commit.
+
+**Upstream rules read (T004)**: only INV-UI-1 matches the feature's paths and it opts out of PR-body
+citation; upstream `Info.plist` already declares an accessory protocol (Ray-Ban Meta), so appending
+`com.vision.voyager` follows precedent; the dead-code ratchet requires every new file reachable from
+`main.dart`; the architecture ratchet wants a README in `lib/services/devices/recdot/` (added);
+`_legacyDeviceTypeNames` is index-ordered and append-only; Pigeon for `pigeon_interfaces.dart` is
+regenerated with `flutter pub run build_runner build`.
+
 - **iOS transport**: External Accessory session on protocol `com.vision.voyager`
   (protocol.md §2.3). iAP2 sessions stay open in the background with the
   `external-accessory` background mode; a suspended app is woken when data arrives. Community
