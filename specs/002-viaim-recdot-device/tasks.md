@@ -80,7 +80,7 @@
 - [X] T026 [US1] Wire the UI gates: `pages/home/device.dart`, `pages/onboarding/find_device/found_devices.dart`, `pages/settings/device_settings.dart` (no firmware update, no LED, no mic gain for this type); ensure the buds show per-part battery and "disconnected" rather than a spinner when the accessory list no longer contains them
 - [X] T027 [US1] Auto-reconnect: on `onAccessoryListChanged` or app resume, if the stored preferred device is a `viaimRecDot` and it is present, connect without user action (follow how `DeviceProvider` reconnects BLE devices at `providers/device_provider.dart:588-593`)
 - [X] T028 [US1] Run `app/test.sh`, `dart format --line-length 120`, `dart analyze` (count must not rise), and `scripts/check-article-iv.ps1`; commit on `feature/viaim-recdot` with a CHANGELOG line in the fork's changelog if one exists for the app
-- [ ] T029 [US1] **Blocked on the user (build + hardware).** `personal/ci` is based on the old
+- [~] T029 [US1] **Blocked on the user (build + hardware).** `personal/ci` is based on the old
   `feature/file-import` upstream, so `feature/viaim-recdot` (current upstream) will not merge into
   it cleanly. Decide the build branch: (a) rebuild `personal/ci`'s dogfood Codemagic config onto a
   fresh branch cut from `feature/viaim-recdot`, or (b) rebase `personal/ci` onto current upstream then

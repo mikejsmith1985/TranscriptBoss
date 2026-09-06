@@ -66,7 +66,24 @@ Every document that mentions it says so.
 
 **Not run locally**: `app/test.sh` end-to-end (needs the firebase/env bootstrap Codemagic performs); iOS compilation. Both are the Codemagic build's job.
 
-### Layer 2 — TestFlight (pending — needs the user's iPhone)
+### Layer 2 — TestFlight
+
+**Build succeeded and uploaded (2026-09-06, version 1.0.543).** Codemagic `ios-personal-dogfood`
+on `personal/recdot-ci` went green after four iterations; the RecDot Swift and Xcode project
+compiled cleanly on the second, and the last two fixes were build-config, dogfood-branch only:
+
+| Build | Failure | Fix (build branch only) |
+|---|---|---|
+| 1 | no log visibility | added a poller reading step status |
+| 2 | first compile | teed `build_ipa.log` to an artifact to read errors |
+| 3 | App Group mismatch | strip the upstream App Group entitlement (personal profiles don't include it) |
+| 4 | embedded-binary cert mismatch | drop the watch app + battery widget from the Runner build |
+
+Upstream and `feature/viaim-recdot` keep the watch app, widget and App Group untouched — those
+edits live only on the build branch. **Now on the user:** install version 1.0.543 from TestFlight,
+force-quit the viaim app, pair the RecDot in Omi, and report rows 1–2 below.
+
+### Layer 2 rows to record on-device
 
 **Build branch is ready.** `personal/recdot-ci` (fork, commit 67dc848) = current upstream + the
 RecDot support + the personal dogfood Codemagic config, without the 001 file-import feature. The
