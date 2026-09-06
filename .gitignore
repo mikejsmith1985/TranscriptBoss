@@ -69,3 +69,6 @@ Thumbs.db
 
 # --- Article XI: at most one dashboard, purged each session ---
 refactor_plan.html
+
+# --- Local fixture-generation tools (scripts/generate_*_vectors.py) ---
+scripts/.tools/

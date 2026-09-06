@@ -55,7 +55,27 @@ $ownedPaths = @(
     'lib/services/export',
     'test/unit/import',
     'test/unit/export',
-    'integration_test/import'
+    'integration_test/import',
+    # Feature 002 — viaim RecDot native device (specs/002-viaim-recdot-device/plan.md)
+    'lib/services/devices/recdot',
+    'lib/services/devices/connectors/viaim_recdot_connection.dart',
+    'lib/services/devices/transports/recdot_link_transport.dart',
+    'lib/services/devices/discovery/viaim_recdot_discoverer.dart',
+    'lib/services/bridges/recdot_link_bridge.dart',
+    'lib/services/audio_sources/recdot_channel_source.dart',
+    'lib/services/capture/recdot_capture_session.dart',
+    'lib/utils/audio/g722_decoder.dart',
+    'lib/utils/audio/msbc_decoder.dart',
+    'test/unit/recdot_starot_codec_test.dart',
+    'test/unit/recdot_commands_test.dart',
+    'test/unit/recdot_device_test.dart',
+    'test/unit/recdot_link_transport_test.dart',
+    'test/unit/recdot_connection_test.dart',
+    'test/unit/recdot_discoverer_test.dart',
+    'test/unit/recdot_channel_source_test.dart',
+    'test/unit/recdot_capture_session_test.dart',
+    'test/unit/recdot_flash_sync_test.dart',
+    'test/unit/g722_decoder_test.dart'
 )
 
 $existing = @()

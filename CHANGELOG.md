@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   independent implementation the Omi connector's golden fixtures will come from
   (its first golden vector is the advertisement a real RecDot broadcast to the
   user's iPhone)
+- `scripts/generate_recdot_vectors.py` and `scripts/generate_g722_vectors.py` — write the
+  JSON golden fixtures the Omi fork's Dart codec and G.722 decoder are tested against,
+  from the Python reference codec and the bit-exact ITU G.722 build respectively
+- Feature 002 (viaim RecDot native device) specification, plan, contracts and tasks
+  under `specs/002-viaim-recdot-device/`; `scripts/check-article-iv.ps1` owns its paths
 - Forge Workflow initialized with Forge Terminal Workflow Architect
 - Specification, plan, and task breakdown for **External Audio Import & Transcript
   Reconciliation for Omi** under `specs/001-omi-audio-import/`

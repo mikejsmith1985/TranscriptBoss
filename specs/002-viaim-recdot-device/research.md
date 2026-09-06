@@ -89,6 +89,10 @@ is the substitute for this feature.
 
 ## Part 2 — Vendor and platform facts that shape the design
 
+**Fork pin (T001, 2026-09-06)**: worktree `omi-recdot/` on branch `feature/viaim-recdot` at upstream
+`1d91c471cd` ("fix(desktop): shorten settings search placeholder", 2026-09-06). Remotes: `upstream`/`origin` =
+BasedHardware/omi (origin push disabled), `fork` = mikejsmith1985/omi.
+
 - **iOS transport**: External Accessory session on protocol `com.vision.voyager`
   (protocol.md §2.3). iAP2 sessions stay open in the background with the
   `external-accessory` background mode; a suspended app is woken when data arrives. Community
