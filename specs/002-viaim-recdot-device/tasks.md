@@ -79,8 +79,14 @@
 - [X] T025 [US1] Implement `lib/services/devices/discovery/viaim_recdot_discoverer.dart` (`DeviceDiscoverer`, `isSupported` = iOS or Android) and register it in `lib/services/devices.dart:48-52`. Run T024 to green
 - [X] T026 [US1] Wire the UI gates: `pages/home/device.dart`, `pages/onboarding/find_device/found_devices.dart`, `pages/settings/device_settings.dart` (no firmware update, no LED, no mic gain for this type); ensure the buds show per-part battery and "disconnected" rather than a spinner when the accessory list no longer contains them
 - [X] T027 [US1] Auto-reconnect: on `onAccessoryListChanged` or app resume, if the stored preferred device is a `viaimRecDot` and it is present, connect without user action (follow how `DeviceProvider` reconnects BLE devices at `providers/device_provider.dart:588-593`)
-- [ ] T028 [US1] Run `app/test.sh`, `dart format --line-length 120`, `dart analyze` (count must not rise), and `scripts/check-article-iv.ps1`; commit on `feature/viaim-recdot` with a CHANGELOG line in the fork's changelog if one exists for the app
-- [ ] T029 [US1] Merge `feature/viaim-recdot` into `personal/ci`, trigger Codemagic `ios-personal-dogfood`, install from TestFlight, force-quit the viaim app, and record quickstart rows 1 and 2 with build number in `specs/002-viaim-recdot-device/quickstart.md` (Evidence log section, to be added)
+- [X] T028 [US1] Run `app/test.sh`, `dart format --line-length 120`, `dart analyze` (count must not rise), and `scripts/check-article-iv.ps1`; commit on `feature/viaim-recdot` with a CHANGELOG line in the fork's changelog if one exists for the app
+- [ ] T029 [US1] **Blocked on the user (build + hardware).** `personal/ci` is based on the old
+  `feature/file-import` upstream, so `feature/viaim-recdot` (current upstream) will not merge into
+  it cleanly. Decide the build branch: (a) rebuild `personal/ci`'s dogfood Codemagic config onto a
+  fresh branch cut from `feature/viaim-recdot`, or (b) rebase `personal/ci` onto current upstream then
+  merge. Then push to the fork remote (needs explicit instruction), trigger Codemagic
+  `ios-personal-dogfood`, install from TestFlight, force-quit the viaim app, and record quickstart
+  rows 1–2 with the build number in the Evidence log
 
 **Note (2026-09-06)**: T026/T027 needed no RecDot-specific production code — the generic device flow already handles pairing, battery, firmware suppression and resume-reconnect for a plain new device type (unlike the Apple Watch / Ray-Ban auth flows). Locked in by factory-mapping tests in `recdot_device_test.dart`.
 

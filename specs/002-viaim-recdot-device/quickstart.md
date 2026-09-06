@@ -45,3 +45,29 @@ feature and the upstream PR body's "verification evidence" section.
 
 Android. The Kotlin transport compiles in Codemagic and is covered only by the shared Dart tests.
 Every document that mentions it says so.
+
+## Evidence log
+
+### Layer 1 — hermetic (2026-09-06, fork branch `feature/viaim-recdot` at upstream `1d91c471`)
+
+| Check | Result |
+|---|---|
+| STAROT codec + G.722 decoder (`recdot_starot_codec_test`, `g722_decoder_test`) | 58 pass, G.722 bit-exact vs ITU reference |
+| Typed commands (`recdot_commands_test`) | 13 pass |
+| Device identity + factory mapping (`recdot_device_test`) | 12 pass |
+| Link transport (`recdot_link_transport_test`) | 6 pass |
+| Connector handshake (`recdot_connection_test`) | 6 pass |
+| Discoverer (`recdot_discoverer_test`) | 4 pass |
+| Golden-vector generators (`scripts` suite) | 53 pass |
+| Omi analyzer ratchet (`app/scripts/analyze_ratchet.sh`) | passed; `use_super_parameters` improved 6→4 |
+| Article IV gate (`scripts/check-article-iv.ps1`) | passed, 15 files |
+| `flutter analyze lib` errors | 0 (after firebase bootstrap) |
+| Regression (`device_provider_test`, exhaustive-map guards, full `test/unit`) | pass; only the 2 pre-existing Windows-env flakes (l10n path, temp-file lock) fail |
+
+**Not run locally**: `app/test.sh` end-to-end (needs the firebase/env bootstrap Codemagic performs); iOS compilation. Both are the Codemagic build's job.
+
+### Layer 2 — TestFlight (pending — needs the user's iPhone)
+
+Blocked on T029. The build branch must be prepared first: `personal/ci` sits on the old
+`feature/file-import` upstream base, so `feature/viaim-recdot` (current upstream) cannot be
+merged into it cleanly. Decision required (see tasks.md T029 note).
