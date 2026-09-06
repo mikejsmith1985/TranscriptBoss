@@ -17,7 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Protocol notes for the **viaim RecDot** earbuds under `specs/002-viaim-recdot-device/`,
   recovered from the vendor's Android app: v2 framing, bond-code handshake, the
   two-channel call-audio stream, and the FlashRecord download commands. The iOS
-  transport is recorded as unresolved.
+  transport was then confirmed from the vendor's iOS app bundle: an MFi External
+  Accessory session on protocol `com.vision.voyager`.
 - `scripts/recdot_wire.py` — reference encoder/decoder for those layouts, with
   hermetic tests that pin the exact wire bytes the notes claim; it is the
   independent implementation the Omi connector's golden fixtures will come from

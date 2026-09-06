@@ -6,8 +6,10 @@ Observed behaviour only. No vendor code is reproduced here. Class references poi
 decompiled tree so any claim can be re-checked; obfuscated package names (`p025b8`, `p085f8`,
 `p165kd`, …) are jadx's, not the vendor's.
 
-**Status**: static analysis of the Android app. Nothing below has been confirmed against a live
-RecDot yet, and the **iOS transport is unresolved** (§2.3). Dynamic confirmation is Phase A step 2.
+**Status**: static analysis of the Android app, plus two hardware/iOS facts confirmed on
+2026-09-06: the BLE advertisement (§2.2, captured on the user's iPhone) and the **iOS transport**
+(§2.3, read from the viaim iOS app's `Info.plist`). The command-level behaviour is still
+unconfirmed against a live RecDot; that is Phase A step 2.
 
 ---
 
@@ -72,22 +74,41 @@ every ~170–330 ms, −21 to −33 dBm with the buds beside the phone, connecte
 **BLE GATT is therefore ruled out as the iOS transport while the buds are paired and connected
 to the phone.** Whether the advert turns connectable in pairing mode is untested.
 
-### 2.3 Consequence for iOS — UNRESOLVED, MFi now the leading hypothesis
+### 2.3 iOS transport — RESOLVED: MFi External Accessory, protocol `com.vision.voyager`
 
-A third-party iOS app cannot open RFCOMM, and the BLE advert is non-connectable. viaim
-markets the sibling OpenNote as "MFi certified", which for a Bluetooth accessory means iAP2
-over the Classic link, i.e. an External Accessory session. The viaim iOS app therefore uses
-one of:
+The viaim iOS app (`com.intelligence.viaim-international` 2.3.0, pulled with ipatool on
+2026-09-06) declares in its `Info.plist`:
 
-| Possibility | How Omi would follow | How to confirm |
-|---|---|---|
-| A firmware BLE GATT service the Android app never uses (BES parts commonly expose one; the stub keeps CSR GAIA UUIDs `00001100/1101/1102/1103-d102-11e1-9b23-00025b00a5a5`) | CoreBluetooth central, write to the command characteristic, notify on response/data — the normal Omi connector shape | A BLE scanner app on the iPhone (nRF Connect / LightBlue) connected to the RecDot lists its GATT services |
-| MFi External Accessory session (iAP2 over Classic) | `ExternalAccessory` framework with the accessory's protocol string in Info.plist; works on TestFlight, App Store needs the vendor's MFi allow-listing | The viaim iOS app's `Info.plist` → `UISupportedExternalAccessoryProtocols`; or the sniffer shows no LE data traffic during a call recording |
-| BLE L2CAP connection-oriented channel | CoreBluetooth `openL2CAPChannel(psm)` | GATT would expose a PSM characteristic; sniffer shows L2CAP CoC |
+| Key | Value |
+|---|---|
+| `UISupportedExternalAccessoryProtocols` | `com.vision.voyager` |
+| `UIBackgroundModes` | `audio`, `bluetooth-central`, `external-accessory` |
 
-Throughput budget either way: G.722 is 64 kbit/s per channel, so a two-channel 16 kHz call is
-128 kbit/s (16 KB/s); the 8 kHz mode halves it. Feasible on a 2M-PHY BLE link with DLE, but must
-be measured on the iPhone.
+So on iOS the buds are an **MFi accessory**: the app opens an `EASession` on protocol
+`com.vision.voyager`, which iAP2 carries over the Classic link the buds already hold for
+A2DP/HFP. That is the iOS twin of the Android RFCOMM socket, and the same v2 framing (§3)
+flows over its input/output streams. `bluetooth-central` matches the discovery-only BLE
+scan (§2.2). The main binary is FairPlay-encrypted, so nothing beyond the plist was read.
+
+**What Omi on iOS must do**
+
+- Declare `com.vision.voyager` in `UISupportedExternalAccessoryProtocols` and add the
+  `external-accessory` background mode in the Runner's `Info.plist`.
+- Enumerate `EAAccessoryManager.shared().connectedAccessories`, pick the one whose
+  `protocolStrings` contains `com.vision.voyager`, open an `EASession`, and run the byte-stream
+  reassembler over its input stream. No scanning, no pairing UI: iOS has already paired the buds
+  as a headset.
+- Expose that as a `DeviceTransport` (the seam Omi's Apple Watch and Ray-Ban Meta connectors use
+  with synthetic characteristic ids), so the Dart connector is transport-agnostic and Android
+  parity is an RFCOMM socket on the SPP UUID.
+- **TestFlight**: External Accessory works for any app that declares the protocol; no vendor
+  involvement. **App Store**: Apple's MFi rules require the accessory maker to allow-list the
+  app, which is a Phase C conversation with viaim, not a Phase B blocker.
+- Throughput is not a concern on iAP2: the Classic link carries the same 128 kbit/s the Android
+  socket does.
+
+Superseded hypotheses, kept for the record: a firmware BLE GATT service (ruled out by the
+non-connectable advert, §2.2) and a BLE L2CAP channel (no PSM, no GATT).
 
 ## 3. Packet framing ("STAROT" GAIA, vendor id 15)
 
@@ -263,14 +284,16 @@ payload, window 4). Recorded for completeness; Omi's capture and FlashRecord pat
 | Battery in the device list | BLE advert bytes 3–5, or `0x5505` |
 | Identity | advert product id 8/9 + bud MACs; serial prefix `A92`/`A96` after connect |
 | Codec | G.722 decoder (Core Audio has none; a small pure-Dart or C decoder is needed), optional mSBC |
-| Transport on iOS | **unresolved, §2.3** — decides the whole iOS connector class |
+| Transport on iOS | External Accessory session on `com.vision.voyager` (§2.3); Android parity is RFCOMM on the SPP UUID |
 
 ## 10. Open items
 
-1. **iOS transport** (§2.3). Fastest check: a BLE scanner app on the iPhone connected to the
-   RecDot, listing its GATT services. Definitive check: the viaim iOS app's `Info.plist`
-   (`UISupportedExternalAccessoryProtocols`, `UIBackgroundModes`) and its GATT UUID strings.
-2. Sustained BLE throughput on the iPhone at 128 kbit/s; whether to prefer `SET_8K`.
-3. Whether the bud accepts `0x500B` from a second host while the Viaim app is not connected
-   (expected yes: bond code 0, no session state observed).
-4. Golden fixtures: capture one `0x5007` burst and one FlashRecord download for hermetic tests.
+1. **Live confirmation** of the command layer: open the EA session from a TestFlight build,
+   send `0x5101` with code 0, expect an ACK with status 0, then `0x550B` and read the serial.
+2. Whether the bud accepts `0x500B` from Omi while the viaim app is not connected (expected
+   yes: bond code 0, no session state observed).
+3. Whether iOS lets two apps hold an EA session on the same protocol at once (expected no):
+   the user closes the viaim app while Omi captures.
+4. Golden fixtures from a real session: one `0x5007` burst and one FlashRecord download.
+5. G.722 decoder for Flutter/iOS (Article VII: Core Audio has none; a small pure-Dart or C
+   decoder is required).
