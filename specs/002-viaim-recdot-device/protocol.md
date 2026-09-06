@@ -74,6 +74,17 @@ every ~170–330 ms, −21 to −33 dBm with the buds beside the phone, connecte
 **BLE GATT is therefore ruled out as the iOS transport while the buds are paired and connected
 to the phone.** Whether the advert turns connectable in pairing mode is untested.
 
+**HARDWARE VERDICT (2026-09-06, TestFlight build 1.0.543 + diagnostic):** With the RecDot showing
+**Connected** in iOS Bluetooth, `EAAccessoryManager.shared().connectedAccessories` returns **zero**
+accessories to our app (diagnostic build printed "EA: none connected"). The viaim app's
+`com.vision.voyager` External Accessory protocol is locked to the viaim bundle id via MFi
+app-matching, so no third-party app can open a session. Combined with the non-connectable BLE
+advert, **there is no iOS transport by which a third-party app can reach the RecDot live.** The
+only iOS path is file import (feature 001): export from the viaim app, import into Omi. The native
+live + FlashRecord transport remains viable on **Android** (RFCOMM is open to apps there), which we
+do not test. All the Dart/codec/connector work stands and drives the Android path and the decoded
+file-import path unchanged.
+
 ### 2.3 iOS transport — RESOLVED: MFi External Accessory, protocol `com.vision.voyager`
 
 The viaim iOS app (`com.intelligence.viaim-international` 2.3.0, pulled with ipatool on
