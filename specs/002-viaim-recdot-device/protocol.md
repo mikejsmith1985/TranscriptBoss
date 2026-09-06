@@ -167,6 +167,8 @@ Two framings exist, chosen per product. **RecDot uses v2.** v1 is only for produ
 | Declare a VoIP call (Teams, Zoom) | `0x5410` SET_CALL_TYPE | attr 1 = 1 |
 | Bud asks to start call record (unsolicited) | `0x5013` → app replies `0x5015` | attr 1 = reply code |
 | Seamless / "Safe Record" flag on the bud | `0x5533` get / `0x5534` set | attr 1 = 0/1 |
+
+**Assumption to confirm on hardware**: the connector treats the battery request (`0x5505`) as answered by an acknowledgement on `0x5505` carrying the battery TLVs. Some firmware may instead answer with an unsolicited `0x5504` notify. The connector already updates battery from `0x5504` pushes, so if the ack does not arrive, the battery step needs only to await the notify. Settle on TestFlight.
 | Mute | `0x5406` / `0x5407` / `0x5408` | |
 | Packet-loss report | `0x5012` | defined, not dispatched in this build |
 
