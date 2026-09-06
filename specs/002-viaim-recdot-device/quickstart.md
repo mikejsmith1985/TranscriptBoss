@@ -68,6 +68,18 @@ Every document that mentions it says so.
 
 ### Layer 2 — TestFlight (pending — needs the user's iPhone)
 
-Blocked on T029. The build branch must be prepared first: `personal/ci` sits on the old
-`feature/file-import` upstream base, so `feature/viaim-recdot` (current upstream) cannot be
-merged into it cleanly. Decision required (see tasks.md T029 note).
+**Build branch is ready.** `personal/recdot-ci` (fork, commit 67dc848) = current upstream + the
+RecDot support + the personal dogfood Codemagic config, without the 001 file-import feature. The
+steps that need the user:
+
+1. Push the branch to the fork:
+   ```
+   git -C C:/ProjectsWin/TranscriptBoss/omi-recdot push fork personal/recdot-ci
+   ```
+2. In Codemagic, run the `ios-personal-dogfood` workflow against `personal/recdot-ci`.
+3. Install the build from TestFlight; force-quit the viaim app first (iOS allows one accessory
+   session per protocol).
+4. Record rows 1 and 2 of the Layer 2 table with the build number.
+
+Note: the dogfood workflow is manually triggered, so any branch works; no push to `personal/ci`
+itself is needed.
