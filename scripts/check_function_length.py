@@ -106,6 +106,19 @@ def _skip_string(source: str, start: int, out: list[str]) -> int:
     return index
 
 
+def _is_test_entrypoint(path: Path, name: str) -> bool:
+    """A Dart test file's top-level `main()` is exempt from the length limit.
+
+    `main()` in a `*_test.dart` file is not a unit of logic we chose to write long;
+    the test framework mandates a single entrypoint that only registers `group`/`test`
+    blocks. Its length tracks how many cases the file covers, and splitting it would
+    mean inventing extra `main()`s or extra files for no readability gain. The rule
+    still applies to every real helper in the same file, and to every function in
+    production code — only this one framework-imposed shell is skipped.
+    """
+    return name == "main" and path.name.endswith("_test.dart")
+
+
 def find_violations(path: Path, limit: int) -> list[Violation]:
     """Report every function in one file whose body exceeds the limit."""
     raw_lines = path.read_text(encoding="utf-8").splitlines()
@@ -126,7 +139,7 @@ def find_violations(path: Path, limit: int) -> list[Violation]:
             continue
 
         body_length = end_line - line_number + 1
-        if body_length > limit:
+        if body_length > limit and not _is_test_entrypoint(path, name):
             violations.append(
                 Violation(path=path, line=line_number + 1, name=name, length=body_length)
             )

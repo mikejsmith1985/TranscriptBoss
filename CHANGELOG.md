@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   independent implementation the Omi connector's golden fixtures will come from
   (its first golden vector is the advertisement a real RecDot broadcast to the
   user's iPhone)
+- `scripts/check_function_length.py` now exempts a Dart test file's framework-mandated
+  `main()` from the 40-line rule, with two tests; helpers in a test file stay checked
 - `scripts/generate_recdot_vectors.py` and `scripts/generate_g722_vectors.py` — write the
   JSON golden fixtures the Omi fork's Dart codec and G.722 decoder are tested against,
   from the Python reference codec and the bit-exact ITU G.722 build respectively

@@ -185,3 +185,25 @@ def test_an_empty_file_is_not_a_violation(tmp_path: Path) -> None:
 
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-v"]))
+
+
+def test_test_file_main_is_exempt_but_its_helpers_are_not(tmp_path: Path) -> None:
+    """A long `main()` in a *_test.dart file is allowed; a long helper beside it is not."""
+    newline = chr(10)
+    long_body = newline.join(f"  test('case {i}', () {{}});" for i in range(60))
+    long_helper = newline.join(f"  final line{i} = {i};" for i in range(60))
+    source = f"void main() {{{newline}{long_body}{newline}}}{newline}{newline}void buildFixture() {{{newline}{long_helper}{newline}}}{newline}"
+    path = write_dart(tmp_path, source, name="sample_test.dart")
+    names = {violation.name for violation in find_violations(path, DEFAULT_LIMIT)}
+    assert "main" not in names
+    assert "buildFixture" in names
+
+
+def test_main_in_a_non_test_file_is_still_checked(tmp_path: Path) -> None:
+    """The exemption is only for test files; a long `main()` in production code still fails."""
+    newline = chr(10)
+    long_body = newline.join(f"  final line{i} = {i};" for i in range(60))
+    source = f"void main() {{{newline}{long_body}{newline}}}{newline}"
+    path = write_dart(tmp_path, source, name="app.dart")
+    names = {violation.name for violation in find_violations(path, DEFAULT_LIMIT)}
+    assert "main" in names
