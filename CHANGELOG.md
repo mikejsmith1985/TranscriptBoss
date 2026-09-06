@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   user's iPhone)
 - `scripts/check_function_length.py` now exempts a Dart test file's framework-mandated
   `main()` from the 40-line rule, with two tests; helpers in a test file stay checked
+- viaim RecDot support in the Omi fork: the STAROT codec and G.722 decoder, typed
+  command builders, the `DeviceType.viaimRecDot` wiring, and the accessory link transport
+  (Dart + iOS External Accessory native). iOS native is verified by the Codemagic build,
+  not on the Windows dev machine
 - `scripts/generate_recdot_vectors.py` and `scripts/generate_g722_vectors.py` — write the
   JSON golden fixtures the Omi fork's Dart codec and G.722 decoder are tested against,
   from the Python reference codec and the bit-exact ITU G.722 build respectively
