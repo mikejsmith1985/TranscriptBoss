@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Browser check page (`index.html`) that verifies system-audio capture, WebGPU, and model-host reachability before the full app is built
 - Forge Workflow initialized with Forge Terminal Workflow Architect
 
 ### Changed
